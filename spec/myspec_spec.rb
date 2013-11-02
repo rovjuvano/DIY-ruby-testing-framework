@@ -4,4 +4,9 @@ describe 'Subject Under Test' do
   Then { @subject =~ /result/ }
   Then { fail 'exception' }
   When { @subject += " Two" }
+  context 'when under conditions' do
+    Given(:new_subject) { "I am nested Given" }
+    When { @new_subject += " Two" }
+    Then { @new_subject =~ /nested Given Two/ }
+  end
 end

@@ -1,7 +1,7 @@
 module MySpec
   module DSL
     def describe(description, &block)
-      context = Context.new
+      context = Context.new(description)
       ContextDSL.new(context).instance_eval &block
       context.run_tests
     end
@@ -11,6 +11,13 @@ module MySpec
     def initialize(context)
       @context = context
     end
+
+    def context(description, &block)
+      @context = @context.add_context(description)
+      instance_eval &block
+      @context = @context.parent
+    end
+
     def Given(name=nil, &block)
       @context.add_given(name, block)
     end
@@ -25,10 +32,19 @@ module MySpec
   end
 
   class Context
-    def initialize
+    attr_reader :parent
+    def initialize(description, parent=nil)
+      @description = description
+      @parent = parent
+      @contexts = []
       @givens = []
       @whens = []
       @thens = []
+    end
+
+    def add_context(description)
+      @contexts << Context.new(description, self)
+      @contexts.last
     end
 
     def add_given(name, block)
@@ -50,6 +66,7 @@ module MySpec
         @whens.each { |w| w.apply(this) }
         puts t.execute(this)
       end
+      @contexts.each { |c| c.run_tests }
     end
   end
 
