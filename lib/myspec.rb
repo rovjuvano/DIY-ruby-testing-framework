@@ -25,8 +25,7 @@ module MySpec
       @thens.each do |t|
         this = Object.new
         @givens.each { |g| g.apply(this) }
-        puts t.execute
-        puts this.inspect
+        puts t.execute(this)
       end
     end
   end
@@ -48,13 +47,13 @@ module MySpec
       @block = block
     end
 
-    def execute
+    def execute(this)
     begin
-      result = @block.call
+      result = this.instance_eval &@block
     rescue Exception => e
       result = false
     end
-    result
+    !!result
     end
   end
 end
