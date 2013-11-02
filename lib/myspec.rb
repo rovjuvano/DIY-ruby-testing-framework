@@ -23,8 +23,10 @@ module MySpec
 
     def run_tests
       @thens.each do |t|
-        @givens.each { |g| g.apply }
+        this = Object.new
+        @givens.each { |g| g.apply(this) }
         puts t.execute
+        puts this.inspect
       end
     end
   end
@@ -35,8 +37,9 @@ module MySpec
       @block = block
     end
 
-    def apply
-      @block.call
+    def apply(this)
+      result = @block.call
+      this.instance_variable_set("@#{@name}", result) if @name
     end
   end
 
