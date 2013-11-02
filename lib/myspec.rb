@@ -1,5 +1,9 @@
 module MySpec
   module DSL
+    def Given(&block)
+      block.call
+    end
+
     def Then(&block)
       puts Then.new(block).execute
     end
