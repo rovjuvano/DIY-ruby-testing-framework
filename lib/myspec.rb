@@ -6,11 +6,16 @@ module MySpec
   end
 
   class ContextDSL
+    def initialize
+      @givens = []
+    end
+
     def Given(&block)
-      block.call
+      @givens << block
     end
 
     def Then(&block)
+      @givens.each { |g| g.call }
       puts Then.new(block).execute
     end
   end
