@@ -13,8 +13,8 @@ module MySpec
       @thens = []
     end
 
-    def Given(&block)
-      @givens << block
+    def Given(name=nil, &block)
+      @givens << Given.new(name, block)
     end
 
     def Then(&block)
@@ -23,9 +23,20 @@ module MySpec
 
     def run_tests
       @thens.each do |t|
-        @givens.each { |g| g.call }
+        @givens.each { |g| g.apply }
         puts t.execute
       end
+    end
+  end
+
+  class Given
+    def initialize(name, block)
+      @name = name
+      @block = block
+    end
+
+    def apply
+      @block.call
     end
   end
 
