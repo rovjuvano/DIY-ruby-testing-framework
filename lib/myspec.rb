@@ -60,10 +60,12 @@ module MySpec
     end
 
     def apply_givens(this)
+      parent.apply_givens(this) if parent
       @givens.each { |g| g.apply(this) }
     end
 
     def apply_whens(this)
+      parent.apply_whens(this) if parent
       @whens.each { |w| w.apply(this) }
     end
 
