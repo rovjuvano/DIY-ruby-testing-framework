@@ -3,5 +3,5 @@ describe 'Subject Under Test' do
   Then { @subject =~ /Given Two/ }
   Then { @subject =~ /result/ }
   Then { fail 'exception' }
-  Given { @subject += " Two" }
+  When { @subject += " Two" }
 end

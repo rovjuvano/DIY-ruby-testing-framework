@@ -10,11 +10,16 @@ module MySpec
   class ContextDSL
     def initialize
       @givens = []
+      @whens = []
       @thens = []
     end
 
     def Given(name=nil, &block)
       @givens << Given.new(name, block)
+    end
+
+    def When(name=nil, &block)
+      @whens << When.new(name, block)
     end
 
     def Then(&block)
@@ -25,12 +30,13 @@ module MySpec
       @thens.each do |t|
         this = Object.new
         @givens.each { |g| g.apply(this) }
+        @whens.each { |w| w.apply(this) }
         puts t.execute(this)
       end
     end
   end
 
-  class Given
+  class Aspect
     def initialize(name, block)
       @name = name
       @block = block
@@ -41,6 +47,9 @@ module MySpec
       this.instance_variable_set("@#{@name}", result) if @name
     end
   end
+
+  class Given < Aspect; end
+  class When < Aspect; end
 
   class Then
     def initialize(block)
