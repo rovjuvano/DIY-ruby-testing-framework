@@ -15,14 +15,26 @@ module MySpec
     end
 
     def Given(name=nil, &block)
-      @givens << Given.new(name, block)
+      add_given(name, block)
     end
 
     def When(name=nil, &block)
-      @whens << When.new(name, block)
+      add_when(name, block)
     end
 
     def Then(&block)
+      add_then(block)
+    end
+
+    def add_given(name, block)
+      @givens << Given.new(name, block)
+    end
+
+    def add_when(name, block)
+      @whens << When.new(name, block)
+    end
+
+    def add_then(block)
       @thens << Then.new(block)
     end
 
