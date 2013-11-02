@@ -1,13 +1,16 @@
 module MySpec
   module DSL
     def describe(description, &block)
-      ContextDSL.new.instance_eval &block
+      context = ContextDSL.new
+      context.instance_eval &block
+      context.run_tests
     end
   end
 
   class ContextDSL
     def initialize
       @givens = []
+      @thens = []
     end
 
     def Given(&block)
@@ -15,8 +18,14 @@ module MySpec
     end
 
     def Then(&block)
-      @givens.each { |g| g.call }
-      puts Then.new(block).execute
+      @thens << Then.new(block)
+    end
+
+    def run_tests
+      @thens.each do |t|
+        @givens.each { |g| g.call }
+        puts t.execute
+      end
     end
   end
 
