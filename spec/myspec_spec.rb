@@ -13,10 +13,12 @@ describe 'Subject Under Test' do
   context 'Givens/Whens only called once' do
     Given { @givens = "G" }
     Given(:givens) { @givens += "G" }
+    Given!(:side_effect) { @givens += "g" }
     When() { @whens = "W" }
     When(:whens) { @whens += "W" }
+    When() { @result0 = @givens + @whens }
     When(:result1) { givens + whens }
     When(:result2) { givens + whens }
-    Then { result1 == 'GGWW' && result2 == 'GGWW' }
+    Then { @result0 == 'GgWW' && result1 == 'GgGWW' && result2 == 'GgGWW' }
   end
 end

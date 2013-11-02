@@ -19,7 +19,11 @@ module MySpec
     end
 
     def Given(name=nil, &block)
-      @context.add_given(name, block)
+      @context.add_given(name, block, false)
+    end
+
+    def Given!(name, &block)
+      @context.add_given(name, block, true)
     end
 
     def When(name=nil, &block)
@@ -47,12 +51,12 @@ module MySpec
       @contexts.last
     end
 
-    def add_given(name, block)
-      @givens << Given.new(name, block)
+    def add_given(name, block, eager)
+      @givens << Given.new(name, block, eager)
     end
 
     def add_when(name, block)
-      @whens << When.new(name, block)
+      @whens << When.new(name, block, true)
     end
 
     def add_then(block)
@@ -81,15 +85,25 @@ module MySpec
   end
 
   class Aspect
-    def initialize(name, block)
+    def initialize(name, block, eager)
       @name = name
       @block = block
+      @eager = eager
     end
 
     def apply(this)
-      result = this.instance_eval &@block
       if @name
-        this.define_singleton_method(@name) { result }
+        block = @block
+        result = nil
+        called = false
+        this.define_singleton_method(@name) do
+          return result if called
+          called = true
+          result = instance_eval &block
+        end
+        this.send(@name) if @eager
+      else
+        this.instance_eval &@block
       end
     end
   end
