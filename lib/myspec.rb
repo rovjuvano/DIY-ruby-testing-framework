@@ -1,7 +1,7 @@
 module MySpec
   module DSL
     def Then(&block)
-      Then.new(block).execute
+      puts Then.new(block).execute
     end
   end
 
@@ -13,10 +13,10 @@ module MySpec
     def execute
     begin
       result = @block.call
-      puts result ? 'pass' : 'fail'
     rescue Exception => e
-      puts e
+      result = false
     end
+    result
     end
   end
 end
