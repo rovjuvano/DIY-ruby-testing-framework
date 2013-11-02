@@ -1,29 +1,34 @@
 module MySpec
   module DSL
     def describe(description, &block)
-      context = ContextDSL.new
-      context.instance_eval &block
+      context = Context.new
+      ContextDSL.new(context).instance_eval &block
       context.run_tests
     end
   end
 
   class ContextDSL
+    def initialize(context)
+      @context = context
+    end
+    def Given(name=nil, &block)
+      @context.add_given(name, block)
+    end
+
+    def When(name=nil, &block)
+      @context.add_when(name, block)
+    end
+
+    def Then(&block)
+      @context.add_then(block)
+    end
+  end
+
+  class Context
     def initialize
       @givens = []
       @whens = []
       @thens = []
-    end
-
-    def Given(name=nil, &block)
-      add_given(name, block)
-    end
-
-    def When(name=nil, &block)
-      add_when(name, block)
-    end
-
-    def Then(&block)
-      add_then(block)
     end
 
     def add_given(name, block)
