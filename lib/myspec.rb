@@ -1,5 +1,11 @@
 module MySpec
   module DSL
+    def describe(description, &block)
+      ContextDSL.new.instance_eval &block
+    end
+  end
+
+  class ContextDSL
     def Given(&block)
       block.call
     end
