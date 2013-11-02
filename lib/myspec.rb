@@ -37,7 +37,7 @@ module MySpec
     end
 
     def apply(this)
-      result = @block.call
+      result = this.instance_eval &@block
       this.instance_variable_set("@#{@name}", result) if @name
     end
   end
