@@ -59,11 +59,19 @@ module MySpec
       @thens << Then.new(block)
     end
 
+    def apply_givens(this)
+      @givens.each { |g| g.apply(this) }
+    end
+
+    def apply_whens(this)
+      @whens.each { |w| w.apply(this) }
+    end
+
     def run_tests
       @thens.each do |t|
         this = Object.new
-        @givens.each { |g| g.apply(this) }
-        @whens.each { |w| w.apply(this) }
+        apply_givens(this)
+        apply_whens(this)
         puts t.execute(this)
       end
       @contexts.each { |c| c.run_tests }
