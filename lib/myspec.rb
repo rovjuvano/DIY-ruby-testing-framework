@@ -87,8 +87,11 @@ module MySpec
     end
 
     def apply(this)
-      result = this.instance_eval &@block
-      this.instance_variable_set("@#{@name}", result) if @name
+      if @name
+        this.define_singleton_method(@name, &@block)
+      else
+        this.instance_eval &@block
+      end
     end
   end
 
