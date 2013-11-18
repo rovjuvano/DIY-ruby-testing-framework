@@ -5,11 +5,16 @@ module DSL
 end
 
 class ContextDSL
+  def initialize
+    @givens = []
+  end
+
   def Given(&block)
-    Given.new(block).run
+    @givens << Given.new(block)
   end
 
   def Then
+    @givens.each {|g| g.run}
     begin
       result = yield
     rescue
