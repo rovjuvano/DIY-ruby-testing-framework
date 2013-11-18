@@ -1,22 +1,36 @@
 module DSL
   def describe(&block)
-    context = ContextDSL.new
-    context.instance_eval &block
+    context = Context.new
+    ContextDSL.new(context).instance_eval &block
     context.run
   end
 end
 
 class ContextDSL
+  def initialize(context)
+    @context = context
+  end
+
+  def Given(&block)
+    @context.add_given(block)
+  end
+
+  def Then(&block)
+    @context.add_then(block)
+  end
+end
+
+class Context
   def initialize
     @givens = []
     @thens = []
   end
 
-  def Given(&block)
+  def add_given(block)
     @givens << Given.new(block)
   end
 
-  def Then(&block)
+  def add_then(block)
     @thens << Then.new(block)
   end
 

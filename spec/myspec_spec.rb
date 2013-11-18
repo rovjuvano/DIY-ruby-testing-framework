@@ -1,7 +1,9 @@
 describe do
   Given { puts 'Hello World' }
   Then { true }
-  Then { false }
+  #context do
+    Then { false }
+  #end
   Then { fail }
   Given { puts 'Goodbye World' }
 end
