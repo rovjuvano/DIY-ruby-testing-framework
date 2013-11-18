@@ -1,4 +1,10 @@
 module DSL
+  def describe(&block)
+    ContextDSL.new.instance_eval &block
+  end
+end
+
+class ContextDSL
   def Given
     yield
   end
@@ -12,4 +18,5 @@ module DSL
     puts result ? 'pass' : 'fail'
   end
 end
+
 extend DSL
