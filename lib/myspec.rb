@@ -1,6 +1,6 @@
 module DSL
   def describe(&block)
-    context = Context.new
+    context = Context.new(nil)
     ContextDSL.new(context).instance_eval &block
     context.run
   end
@@ -12,10 +12,9 @@ class ContextDSL
   end
 
   def context(&block)
-    parent_context = @context;
     @context = @context.add_context
     instance_eval &block
-    @context = parent_context
+    @context = @context.parent
   end
 
   def Given(&block)
@@ -28,14 +27,16 @@ class ContextDSL
 end
 
 class Context
-  def initialize
+  attr_reader :parent
+  def initialize(parent)
+    @parent = parent
     @contexts = []
     @givens = []
     @thens = []
   end
 
   def add_context
-    @contexts << Context.new
+    @contexts << Context.new(self)
     @contexts.last
   end
 
