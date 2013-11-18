@@ -37,6 +37,7 @@ class Context
     @contexts = []
     @givens = []
     @whens = []
+    @exceptions = []
     @thens = []
   end
 
@@ -64,7 +65,17 @@ class Context
 
   def apply_whens(this)
     @parent.apply_whens(this) if @parent
-    @whens.each {|w| w.run(this)}
+    @whens.each do |w|
+      begin
+        w.run(this)
+      rescue Exception => e
+        @exceptions << e
+      end
+    end
+  end
+
+  def has_failed(re)
+    @exceptions.find(re) || (@parent && @parent.has_failed(re))
   end
 
   def run
@@ -100,6 +111,9 @@ class Then
 
   def run(context)
     this = Object.new
+    this.define_singleton_method(:has_failed) do |*args|
+      context.has_failed(*args)
+    end
     context.apply_givens(this)
     context.apply_whens(this)
     begin
