@@ -1,12 +1,15 @@
 module DSL
   def describe(&block)
-    ContextDSL.new.instance_eval &block
+    context = ContextDSL.new
+    context.instance_eval &block
+    context.run
   end
 end
 
 class ContextDSL
   def initialize
     @givens = []
+    @thens = []
   end
 
   def Given(&block)
@@ -14,7 +17,13 @@ class ContextDSL
   end
 
   def Then(&block)
-    puts Then.new(block).run(@givens) ? 'pass' : 'fail'
+    @thens << Then.new(block)
+  end
+
+  def run
+    @thens.each do |t|
+      puts t.run(@givens) ? 'pass' : 'fail'
+    end
   end
 end
 
