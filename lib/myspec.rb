@@ -1,0 +1,3 @@
+def Then
+  yield
+end
