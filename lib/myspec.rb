@@ -5,8 +5,8 @@ module DSL
 end
 
 class ContextDSL
-  def Given
-    yield
+  def Given(&block)
+    Given.new(block).run
   end
 
   def Then
@@ -16,6 +16,16 @@ class ContextDSL
       result = false
     end
     puts result ? 'pass' : 'fail'
+  end
+end
+
+class Given
+  def initialize(block)
+    @block = block
+  end
+
+  def run
+    @block.call
   end
 end
 
