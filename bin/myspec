@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+require 'myspec'
+ARGV.each do |filename|
+  File.open(filename) do |file|
+    eval file.read()
+  end
+end
