@@ -21,6 +21,10 @@ class ContextDSL
     @context.add_given(name, block)
   end
 
+  def When(name=nil, &block)
+    @context.add_when(name, block)
+  end
+
   def Then(&block)
     @context.add_then(block)
   end
@@ -32,6 +36,7 @@ class Context
     @parent = parent
     @contexts = []
     @givens = []
+    @whens = []
     @thens = []
   end
 
@@ -44,6 +49,10 @@ class Context
     @givens << Given.new(name, block)
   end
 
+  def add_when(name, block)
+    @whens << When.new(name, block)
+  end
+
   def add_then(block)
     @thens << Then.new(block)
   end
@@ -51,6 +60,11 @@ class Context
   def apply_givens(this)
     @parent.apply_givens(this) if @parent
     @givens.each {|g| g.run(this)}
+  end
+
+  def apply_whens(this)
+    @parent.apply_whens(this) if @parent
+    @whens.each {|w| w.run(this)}
   end
 
   def run
@@ -61,7 +75,7 @@ class Context
   end
 end
 
-class Given
+class Aspect
   def initialize(name, block)
     @name = name
     @block = block
@@ -76,6 +90,9 @@ class Given
   end
 end
 
+class Given < Aspect; end
+class When < Aspect; end
+
 class Then
   def initialize(block)
     @block = block
@@ -84,6 +101,7 @@ class Then
   def run(context)
     this = Object.new
     context.apply_givens(this)
+    context.apply_whens(this)
     begin
       result = this.instance_eval &@block
     rescue
