@@ -1,6 +1,11 @@
 module DSL
   def Then
-    yield
+    begin
+      result = yield
+    rescue
+      result = false
+    end
+    puts result ? 'pass' : 'fail'
   end
 end
 extend DSL
