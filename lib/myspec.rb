@@ -49,6 +49,7 @@ class Context
   end
 
   def apply_givens
+    @parent.apply_givens if @parent
     @givens.each {|g| g.run}
   end
 
