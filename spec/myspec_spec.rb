@@ -1,5 +1,6 @@
 describe do
   Given { puts 'Hello World' }
+  Given(:name) { :value }
   Then { true }
   context do
     Given { puts 'inner' }

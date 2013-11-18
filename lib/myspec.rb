@@ -17,8 +17,8 @@ class ContextDSL
     @context = @context.parent
   end
 
-  def Given(&block)
-    @context.add_given(block)
+  def Given(name=nil, &block)
+    @context.add_given(name, block)
   end
 
   def Then(&block)
@@ -40,8 +40,8 @@ class Context
     @contexts.last
   end
 
-  def add_given(block)
-    @givens << Given.new(block)
+  def add_given(name, block)
+    @givens << Given.new(name, block)
   end
 
   def add_then(block)
@@ -62,7 +62,8 @@ class Context
 end
 
 class Given
-  def initialize(block)
+  def initialize(name, block)
+    @name = name
     @block = block
   end
 
