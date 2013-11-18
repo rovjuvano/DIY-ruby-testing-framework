@@ -48,9 +48,9 @@ class Context
     @thens << Then.new(block)
   end
 
-  def apply_givens
-    @parent.apply_givens if @parent
-    @givens.each {|g| g.run}
+  def apply_givens(this)
+    @parent.apply_givens(this) if @parent
+    @givens.each {|g| g.run(this)}
   end
 
   def run
@@ -67,8 +67,12 @@ class Given
     @block = block
   end
 
-  def run
-    @block.call
+  def run(this)
+    if @name
+      this.define_singleton_method(@name, &@block)
+    else
+      this.instance_eval &@block
+    end
   end
 end
 
@@ -78,9 +82,10 @@ class Then
   end
 
   def run(context)
-    context.apply_givens
+    this = Object.new
+    context.apply_givens(this)
     begin
-      result = @block.call
+      result = this.instance_eval &@block
     rescue
       result = false
     end
