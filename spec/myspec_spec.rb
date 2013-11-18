@@ -3,6 +3,8 @@ describe do
   And(:G2) { :g2 }
   When(:result) { subject.to_s.length }
   And(:W2) { :w2 }
+  Invariant { true }
+  And { !false }
   Then { subject == :value }
   And { result == 5 }
   context do

@@ -27,6 +27,11 @@ class ContextDSL
     @context.add_when(name, block)
   end
 
+  def Invariant(&block)
+    @and_parent = :Invariant
+    @context.add_invariant(block)
+  end
+
   def Then(&block)
     @and_parent = :ThenAnd
     @then = @context.add_then(block)
@@ -48,6 +53,7 @@ class Context
     @contexts = []
     @givens = []
     @whens = []
+    @invariants = []
     @exceptions = []
     @thens = []
   end
@@ -63,6 +69,10 @@ class Context
 
   def add_when(name, block)
     @whens << When.new(name, block)
+  end
+
+  def add_invariant(block)
+    @invariants << Invariant.new(block)
   end
 
   def add_then(block)
@@ -84,6 +94,13 @@ class Context
         @exceptions << e
       end
     end
+  end
+
+  def apply_invariants(this)
+    ( @parent.nil? || @parent.apply_invariants(this) ) &&
+    ( @invariants.empty? || @invariants.all? do |i|
+      i.run(this)
+    end )
   end
 
   def has_failed(re)
@@ -134,7 +151,7 @@ class Then
     context.apply_whens(this)
     @checks.all? do |c|
       c.run(this)
-    end
+    end && context.apply_invariants(this)
   end
 end
 
@@ -152,5 +169,7 @@ class Check
     result
   end
 end
+
+class Invariant < Check; end
 
 extend DSL
