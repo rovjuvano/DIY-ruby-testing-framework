@@ -11,6 +11,13 @@ class ContextDSL
     @context = context
   end
 
+  def context(&block)
+    parent_context = @context;
+    @context = @context.add_context
+    instance_eval &block
+    @context = parent_context
+  end
+
   def Given(&block)
     @context.add_given(block)
   end
@@ -22,8 +29,14 @@ end
 
 class Context
   def initialize
+    @contexts = []
     @givens = []
     @thens = []
+  end
+
+  def add_context
+    @contexts << Context.new
+    @contexts.last
   end
 
   def add_given(block)
@@ -38,6 +51,7 @@ class Context
     @thens.each do |t|
       puts t.run(@givens) ? 'pass' : 'fail'
     end
+    @contexts.each {|c| c.run}
   end
 end
 
