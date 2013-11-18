@@ -1,6 +1,8 @@
 describe do
   Given(:subject) { :value }
+  And(:G2) { :g2 }
   When(:result) { subject.to_s.length }
+  And(:W2) { :w2 }
   Then { subject == :value }
   Then { result == 5 }
   context do

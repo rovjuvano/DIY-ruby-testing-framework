@@ -18,15 +18,22 @@ class ContextDSL
   end
 
   def Given(name=nil, &block)
+    @and_parent = :Given
     @context.add_given(name, block)
   end
 
   def When(name=nil, &block)
+    @and_parent = :When
     @context.add_when(name, block)
   end
 
   def Then(&block)
+    @and_parent = :ThenAnd
     @context.add_then(block)
+  end
+
+  def And(*args, &block)
+    send(@and_parent, *args, &block)
   end
 end
 
