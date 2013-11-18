@@ -29,11 +29,15 @@ class ContextDSL
 
   def Then(&block)
     @and_parent = :ThenAnd
-    @context.add_then(block)
+    @then = @context.add_then(block)
   end
 
   def And(*args, &block)
-    send(@and_parent, *args, &block)
+    if @and_parent == :ThenAnd
+      @then.add_check(*args, &block)
+    else
+      send(@and_parent, *args, &block)
+    end
   end
 end
 
@@ -63,6 +67,7 @@ class Context
 
   def add_then(block)
     @thens << Then.new(block)
+    @thens.last
   end
 
   def apply_givens(this)
@@ -113,7 +118,11 @@ class When < Aspect; end
 
 class Then
   def initialize(block)
-    @block = block
+    @checks = [Check.new(block)]
+  end
+
+  def add_check(&block)
+    @checks << Check.new(block)
   end
 
   def run(context)
@@ -123,6 +132,18 @@ class Then
     end
     context.apply_givens(this)
     context.apply_whens(this)
+    @checks.all? do |c|
+      c.run(this)
+    end
+  end
+end
+
+class Check
+  def initialize(block)
+    @block = block
+  end
+
+  def run(this)
     begin
       result = this.instance_eval &@block
     rescue
