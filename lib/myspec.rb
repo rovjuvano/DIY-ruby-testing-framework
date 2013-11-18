@@ -1,4 +1,8 @@
 module DSL
+  def Given
+    yield
+  end
+
   def Then
     begin
       result = yield
