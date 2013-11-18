@@ -48,9 +48,13 @@ class Context
     @thens << Then.new(block)
   end
 
+  def apply_givens
+    @givens.each {|g| g.run}
+  end
+
   def run
     @thens.each do |t|
-      puts t.run(@givens) ? 'pass' : 'fail'
+      puts t.run(self) ? 'pass' : 'fail'
     end
     @contexts.each {|c| c.run}
   end
@@ -71,8 +75,8 @@ class Then
     @block = block
   end
 
-  def run(givens)
-    givens.each {|g| g.run}
+  def run(context)
+    context.apply_givens
     begin
       result = @block.call
     rescue
